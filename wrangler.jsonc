@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  "name": "sahin-ai",
+
+  "compatibility_date": "2026-09-19",
+
+  "assets": {
+    "directory": ".",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  }
+}
