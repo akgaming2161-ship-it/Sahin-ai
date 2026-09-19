@@ -1,14 +1,91 @@
-<!DOCTYPE html>
-
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="styles/style.css"/>
-  <title>Hello, World!</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sahin AI</title>
+<style>
+:root{--bg:#f7f7f8;--panel:#fff;--text:#171717;--muted:#6b7280;--line:#e5e7eb;--accent:#111827}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+.app{display:flex;min-height:100vh}.side{width:270px;background:#111827;color:#fff;padding:18px;display:flex;flex-direction:column;gap:18px}
+.logo{font-size:22px;font-weight:800}.new{border:1px solid #374151;background:#1f2937;color:#fff;padding:11px 14px;border-radius:10px;cursor:pointer}.history{flex:1;overflow:auto}.history button{display:block;width:100%;text-align:left;border:0;background:transparent;color:#d1d5db;padding:10px;border-radius:8px;cursor:pointer}.history button:hover{background:#1f2937}.main{flex:1;display:flex;flex-direction:column;min-width:0}.top{height:62px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px}.top strong{font-size:18px}.icon{border:0;background:transparent;font-size:20px;cursor:pointer;padding:8px}.chat{flex:1;overflow:auto;padding:30px 18px 140px}.wrap{max-width:850px;margin:auto}.welcome{text-align:center;padding:12vh 10px}.welcome h1{font-size:38px;margin:0 0 10px}.welcome p{color:var(--muted)}.msg{display:flex;gap:12px;margin:22px 0}.avatar{width:34px;height:34px;border-radius:9px;background:#111827;color:#fff;display:grid;place-items:center;font-weight:700;flex:none}.user .avatar{background:#e5e7eb;color:#111}.bubble{max-width:78%;line-height:1.6;white-space:pre-wrap}.composer{position:fixed;left:270px;right:0;bottom:0;padding:16px;background:linear-gradient(transparent,var(--bg) 35%)}.box{max-width:850px;margin:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px;display:flex;align-items:flex-end;gap:8px;box-shadow:0 4px 18px #0000000d}.box textarea{flex:1;border:0;outline:0;resize:none;background:transparent;font:inherit;min-height:44px;max-height:150px;padding:10px}.send{background:#111827;color:#fff;border:0;border-radius:11px;width:44px;height:44px;cursor:pointer}.file{display:none}.modal{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;padding:20px}.card{background:var(--panel);width:min(440px,100%);border-radius:16px;padding:22px}.card h2{margin-top:0}.row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.close{float:right;border:0;background:transparent;font-size:22px;cursor:pointer}
+@media(max-width:700px){.side{display:none}.composer{left:0}.welcome h1{font-size:30px}.bubble{max-width:88%}}
+.dark{--bg:#0b0f14;--panel:#111827;--text:#f3f4f6;--muted:#9ca3af;--line:#273244}.dark .top{border-color:#273244}.dark .box{box-shadow:none}
+</style>
 </head>
 <body>
-  <h1>
-    Hello, World!
-  </h1>
+<div class="app">
+<aside class="side">
+  <div class="logo">✦ Sahin AI</div>
+  <button class="new" id="newChat">＋ New chat</button>
+  <div class="history" id="history"></div>
+  <button class="new" id="settings">⚙ Settings</button>
+</aside>
+<main class="main">
+  <header class="top"><strong>Sahin AI</strong><button class="icon" id="mobileSettings">⚙</button></header>
+  <section class="chat" id="chat"><div class="wrap" id="wrap">
+    <div class="welcome" id="welcome"><h1>How can I help?</h1><p>Chat, upload a file, or use your microphone.</p></div>
+  </div></section>
+</main>
+</div>
+
+<div class="composer">
+  <div class="box">
+    <label class="icon" title="Attach file">📎<input class="file" id="file" type="file" accept=".txt,.pdf,.png,.jpg,.jpeg"></label>
+    <button class="icon" id="mic" title="Voice input">🎙️</button>
+    <textarea id="input" placeholder="Message Sahin AI..." rows="1"></textarea>
+    <button class="send" id="send">➤</button>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="card">
+  <button class="close" id="close">×</button><h2>Settings</h2>
+  <div class="row"><span>Dark mode</span><button class="new" id="theme">Toggle</button></div>
+  <div class="row"><span>Clear chat history</span><button class="new" id="clear">Clear</button></div>
+  <p style="color:var(--muted);font-size:13px">This is a front-end demo. Connect your own secure backend/API to make AI generation, authentication, search, and file analysis real. Never put secret API keys in this HTML file.</p>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id), chat=$('chat'), wrap=$('wrap'), input=$('input');
+let messages=JSON.parse(localStorage.getItem('sahin_history')||'[]');
+function save(){localStorage.setItem('sahin_history',JSON.stringify(messages));}
+function render(){
+  wrap.innerHTML='';
+  if(!messages.length){wrap.innerHTML='<div class="welcome"><h1>How can I help?</h1><p>Chat, upload a file, or use your microphone.</p></div>';return}
+  messages.forEach(m=>addMessage(m.role,m.text,false));
+  chat.scrollTop=chat.scrollHeight;
+}
+function addMessage(role,text,store=true){
+  if($('welcome')) $('welcome').remove();
+  const row=document.createElement('div'); row.className='msg '+role;
+  const av=document.createElement('div'); av.className='avatar'; av.textContent=role==='user'?'U':'S';
+  const b=document.createElement('div'); b.className='bubble'; b.textContent=text;
+  row.append(av,b); wrap.appendChild(row);
+  if(store){messages.push({role,text});save()}
+  chat.scrollTop=chat.scrollHeight;
+}
+function reply(text){
+  const lower=text.toLowerCase();
+  let r='I’m Sahin AI. I’m connecting to the server…';
+  if(lower.includes('hello')||lower.includes('hi')) r='Hello! 👋 I’m Sahin AI. How can I help you today?';
+  else if(lower.includes('who are you')) r='I’m Sahin AI, your AI assistant interface.';
+  (async()=>{try{const api=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...messages,{role:'user',text}] .map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.text}))})});const data=await api.json();if(!api.ok)throw new Error(data.error||'Request failed');addMessage('assistant',data.text||'No response.')}catch(e){setTimeout(()=>addMessage('assistant',r+'\\n\\nServer message: '+e.message),300)}})();
+}
+$('send').onclick=()=>{const t=input.value.trim();if(!t)return;addMessage('user',t);input.value='';reply(t)};
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('send').click()}});
+$('newChat').onclick=()=>{messages=[];save();render()};
+$('settings').onclick=$('mobileSettings').onclick=()=>$('modal').style.display='flex';
+$('close').onclick=()=>$('modal').style.display='none';
+$('theme').onclick=()=>{document.body.classList.toggle('dark');localStorage.setItem('sahin_dark',document.body.classList.contains('dark'))};
+$('clear').onclick=()=>{messages=[];save();render();$('modal').style.display='none'};
+if(localStorage.getItem('sahin_dark')==='true')document.body.classList.add('dark');
+$('file').onchange=e=>{const f=e.target.files[0];if(f)addMessage('user','📎 Attached: '+f.name+'\\nFile is selected. Connect a secure backend to analyze its contents.')};
+$('mic').onclick=()=>{
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Voice input is not supported in this browser.');return}
+  const r=new SR();r.lang='en-US';r.onresult=e=>input.value=e.results[0][0].transcript;r.start();
+};
+render();
+</script>
 </body>
 </html>
