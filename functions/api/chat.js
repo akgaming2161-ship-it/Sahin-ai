@@ -2,37 +2,50 @@ export async function onRequestPost(context) {
   try {
     const body = await context.request.json();
 
-    const messages = Array.isArray(body.messages)
+    const messages = Array.isArray(body?.messages)
       ? body.messages
       : [];
 
-    if (!messages.length) {
-      return new Response(
-        JSON.stringify({
-          error: "No messages provided."
-        }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+    if (messages.length === 0) {
+      return json(
+        { error: "No messages provided." },
+        400
       );
     }
 
+    // API key must be stored as a Cloudflare secret.
     const apiKey = context.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-      return new Response(
-        JSON.stringify({
-          error: "OPENAI_API_KEY is not configured."
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+      return json(
+        { error: "OPENAI_API_KEY is not configured." },
+        500
+      );
+    }
+
+    // Keep only valid chat messages.
+    const cleanMessages = messages
+      .slice(-20)
+      .map((message) => {
+        const role =
+          message?.role === "assistant"
+            ? "assistant"
+            : "user";
+
+        return {
+          role,
+          content: String(message?.content ?? "")
+        };
+      })
+      .filter(
+        (message) =>
+          message.content.trim().length > 0
+      );
+
+    if (cleanMessages.length === 0) {
+      return json(
+        { error: "No valid messages provided." },
+        400
       );
     }
 
@@ -48,18 +61,8 @@ export async function onRequestPost(context) {
 
         body: JSON.stringify({
           model: "gpt-4o-mini",
-
-          messages: messages
-            .slice(-20)
-            .map((message) => ({
-              role:
-                message.role === "assistant"
-                  ? "assistant"
-                  : "user",
-
-              content:
-                String(message.content || "")
-            }))
+          messages: cleanMessages,
+          temperature: 0.7
         })
       }
     );
@@ -67,48 +70,59 @@ export async function onRequestPost(context) {
     const data = await response.json();
 
     if (!response.ok) {
-      return new Response(
-        JSON.stringify({
+      return json(
+        {
           error:
             data?.error?.message ||
             "OpenAI request failed."
-        }),
-        {
-          status: response.status,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+        },
+        response.status
       );
     }
 
     const text =
-      data?.choices?.[0]?.message?.content || "";
+      data?.choices?.[0]?.message?.content;
 
-    return new Response(
-      JSON.stringify({
-        text: text
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
+    if (!text) {
+      return json(
+        { error: "No AI response received." },
+        502
+      );
+    }
+
+    return json({
+      text: text
+    });
 
   } catch (error) {
 
-    return new Response(
-      JSON.stringify({
-        error: "Server error."
-      }),
+    console.error("Sahin AI API error:", error);
+
+    return json(
       {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
+        error:
+          error?.message ||
+          "Server error."
+      },
+      500
     );
   }
+}
+
+
+/* =========================
+   JSON RESPONSE
+========================= */
+
+function json(data, status = 200) {
+  return new Response(
+    JSON.stringify(data),
+    {
+      status,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store"
+      }
+    }
+  );
 }
