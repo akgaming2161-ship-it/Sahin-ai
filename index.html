@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Sahin AI</title>
 
 <style>
@@ -17,38 +17,66 @@
 
 *{
   box-sizing:border-box;
+  min-width:0;
+}
+
+html,
+body{
+  margin:0;
+  padding:0;
+  width:100%;
+  max-width:100%;
+  height:100%;
+  overflow:hidden;
 }
 
 body{
-  margin:0;
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
 
 button,
-textarea{
+textarea,
+input{
   font:inherit;
+}
+
+button{
+  -webkit-tap-highlight-color:transparent;
 }
 
 .app{
   display:flex;
-  min-height:100vh;
+  width:100%;
+  max-width:100%;
+  height:100vh;
+  min-height:0;
+  overflow:hidden;
 }
+
+/* =========================
+   SIDEBAR
+========================= */
 
 .side{
   width:270px;
+  max-width:270px;
+  flex:0 0 270px;
   background:#111827;
   color:#fff;
   padding:18px;
   display:flex;
   flex-direction:column;
   gap:18px;
+  overflow:hidden;
 }
 
 .logo{
   font-size:22px;
   font-weight:800;
+  letter-spacing:.2px;
+  white-space:nowrap;
 }
 
 .new{
@@ -58,6 +86,7 @@ textarea{
   padding:11px 14px;
   border-radius:10px;
   cursor:pointer;
+  transition:.2s;
 }
 
 .new:hover{
@@ -66,12 +95,16 @@ textarea{
 
 .history{
   flex:1;
-  overflow:auto;
+  min-height:0;
+  width:100%;
+  overflow-y:auto;
+  overflow-x:hidden;
 }
 
 .history button{
   display:block;
   width:100%;
+  max-width:100%;
   text-align:left;
   border:0;
   background:transparent;
@@ -79,21 +112,35 @@ textarea{
   padding:10px;
   border-radius:8px;
   cursor:pointer;
+  margin-bottom:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 .history button:hover{
   background:#1f2937;
 }
 
+/* =========================
+   MAIN
+========================= */
+
 .main{
-  flex:1;
+  flex:1 1 auto;
+  width:calc(100% - 270px);
+  max-width:calc(100% - 270px);
+  min-width:0;
+  min-height:0;
   display:flex;
   flex-direction:column;
-  min-width:0;
+  overflow:hidden;
 }
 
 .top{
   height:62px;
+  min-height:62px;
+  flex:none;
   background:var(--panel);
   border-bottom:1px solid var(--line);
   display:flex;
@@ -109,23 +156,44 @@ textarea{
 .icon{
   border:0;
   background:transparent;
+  color:inherit;
   font-size:20px;
   cursor:pointer;
   padding:8px;
+  border-radius:8px;
+  flex:none;
 }
 
+.icon:hover{
+  background:#0000000a;
+}
+
+/* =========================
+   CHAT
+========================= */
+
 .chat{
-  flex:1;
-  overflow:auto;
-  padding:30px 18px 140px;
+  flex:1 1 auto;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:30px 18px 150px;
+  scroll-behavior:smooth;
 }
 
 .wrap{
+  width:100%;
   max-width:850px;
-  margin:auto;
+  min-width:0;
+  margin:0 auto;
 }
 
 .welcome{
+  width:100%;
+  max-width:100%;
   text-align:center;
   padding:12vh 10px;
 }
@@ -137,17 +205,25 @@ textarea{
 
 .welcome p{
   color:var(--muted);
+  margin:0;
+  overflow-wrap:anywhere;
 }
 
 .msg{
   display:flex;
+  align-items:flex-start;
   gap:12px;
   margin:22px 0;
+  width:100%;
+  max-width:100%;
+  min-width:0;
 }
 
 .avatar{
   width:34px;
   height:34px;
+  min-width:34px;
+  min-height:34px;
   border-radius:9px;
   background:#111827;
   color:#fff;
@@ -163,18 +239,33 @@ textarea{
 }
 
 .bubble{
-  max-width:78%;
+  width:auto;
+  max-width:calc(100% - 46px);
+  min-width:0;
   line-height:1.6;
   white-space:pre-wrap;
   word-break:break-word;
+  overflow-wrap:anywhere;
 }
+
+.typing{
+  color:var(--muted);
+  font-style:italic;
+}
+
+/* =========================
+   COMPOSER
+========================= */
 
 .composer{
   position:fixed;
   left:270px;
   right:0;
   bottom:0;
+  width:auto;
+  max-width:none;
   padding:16px;
+  z-index:20;
   background:linear-gradient(
     transparent,
     var(--bg) 35%
@@ -182,7 +273,9 @@ textarea{
 }
 
 .box{
+  width:100%;
   max-width:850px;
+  min-width:0;
   margin:auto;
   background:var(--panel);
   border:1px solid var(--line);
@@ -192,10 +285,14 @@ textarea{
   align-items:flex-end;
   gap:8px;
   box-shadow:0 4px 18px #0000000d;
+  overflow:hidden;
 }
 
 .box textarea{
-  flex:1;
+  flex:1 1 auto;
+  width:100%;
+  min-width:0;
+  max-width:100%;
   border:0;
   outline:0;
   resize:none;
@@ -205,16 +302,26 @@ textarea{
   min-height:44px;
   max-height:150px;
   padding:10px;
+  line-height:1.4;
+  overflow-y:auto;
+}
+
+.box textarea::placeholder{
+  color:var(--muted);
 }
 
 .send{
+  flex:0 0 44px;
+  width:44px;
+  height:44px;
+  min-width:44px;
+  min-height:44px;
   background:#111827;
   color:#fff;
   border:0;
   border-radius:11px;
-  width:44px;
-  height:44px;
   cursor:pointer;
+  transition:.2s;
 }
 
 .send:hover{
@@ -230,10 +337,16 @@ textarea{
   display:none;
 }
 
+/* =========================
+   SETTINGS MODAL
+========================= */
+
 .modal{
   display:none;
   position:fixed;
   inset:0;
+  width:100%;
+  height:100%;
   background:#0008;
   align-items:center;
   justify-content:center;
@@ -245,6 +358,9 @@ textarea{
   background:var(--panel);
   color:var(--text);
   width:min(440px,100%);
+  max-width:100%;
+  max-height:90vh;
+  overflow:auto;
   border-radius:16px;
   padding:22px;
 }
@@ -257,8 +373,14 @@ textarea{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:15px;
   padding:13px 0;
   border-bottom:1px solid var(--line);
+}
+
+.row span{
+  min-width:0;
+  overflow-wrap:anywhere;
 }
 
 .close{
@@ -270,10 +392,9 @@ textarea{
   cursor:pointer;
 }
 
-.typing{
-  color:var(--muted);
-  font-style:italic;
-}
+/* =========================
+   DARK MODE
+========================= */
 
 .dark{
   --bg:#0b0f14;
@@ -291,22 +412,150 @@ textarea{
   box-shadow:none;
 }
 
+.dark .icon:hover{
+  background:#ffffff0d;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
 @media(max-width:700px){
 
   .side{
     display:none;
   }
 
+  .main{
+    width:100%;
+    max-width:100%;
+  }
+
+  .top{
+    padding:0 12px;
+  }
+
   .composer{
     left:0;
+    right:0;
+    width:100%;
+    padding:10px;
+    background:linear-gradient(
+      transparent,
+      var(--bg) 25%
+    );
+  }
+
+  .chat{
+    padding:20px 12px 125px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:100%;
+  }
+
+  .welcome{
+    padding:10vh 10px;
   }
 
   .welcome h1{
     font-size:30px;
   }
 
+  .msg{
+    gap:8px;
+    margin:18px 0;
+  }
+
+  .avatar{
+    width:32px;
+    height:32px;
+    min-width:32px;
+    min-height:32px;
+  }
+
   .bubble{
-    max-width:88%;
+    max-width:calc(100% - 40px);
+  }
+
+  .box{
+    width:100%;
+    max-width:100%;
+    border-radius:14px;
+  }
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media(max-width:420px){
+
+  .composer{
+    padding:8px;
+  }
+
+  .box{
+    gap:3px;
+    padding:6px;
+    border-radius:13px;
+  }
+
+  .icon{
+    font-size:18px;
+    padding:7px;
+  }
+
+  .send{
+    flex:0 0 42px;
+    width:42px;
+    height:42px;
+    min-width:42px;
+    min-height:42px;
+  }
+
+  .box textarea{
+    padding:9px 5px;
+    font-size:15px;
+  }
+
+  .chat{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .msg{
+    gap:7px;
+  }
+
+  .bubble{
+    max-width:calc(100% - 39px);
+    font-size:15px;
+  }
+}
+
+/* =========================
+   VERY SMALL SCREEN
+========================= */
+
+@media(max-width:330px){
+
+  .icon{
+    padding:5px;
+    font-size:16px;
+  }
+
+  .box textarea{
+    font-size:14px;
+  }
+
+  .send{
+    flex-basis:40px;
+    width:40px;
+    min-width:40px;
+    height:40px;
+    min-height:40px;
   }
 }
 </style>
@@ -316,24 +565,28 @@ textarea{
 
 <div class="app">
 
+  <!-- SIDEBAR -->
+
   <aside class="side">
 
     <div class="logo">
       ✦ Sahin AI
     </div>
 
-    <button class="new" id="newChat">
+    <button class="new" id="newChat" type="button">
       ＋ New chat
     </button>
 
     <div class="history" id="history"></div>
 
-    <button class="new" id="settings">
+    <button class="new" id="settings" type="button">
       ⚙ Settings
     </button>
 
   </aside>
 
+
+  <!-- MAIN -->
 
   <main class="main">
 
@@ -345,6 +598,8 @@ textarea{
         class="icon"
         id="mobileSettings"
         title="Settings"
+        aria-label="Settings"
+        type="button"
       >
         ⚙
       </button>
@@ -377,7 +632,9 @@ textarea{
 </div>
 
 
-<!-- Composer -->
+<!-- =========================
+     COMPOSER
+========================= -->
 
 <div class="composer">
 
@@ -386,6 +643,7 @@ textarea{
     <label
       class="icon"
       title="Attach file"
+      aria-label="Attach file"
     >
       📎
 
@@ -403,6 +661,8 @@ textarea{
       class="icon"
       id="mic"
       title="Voice input"
+      aria-label="Voice input"
+      type="button"
     >
       🎙️
     </button>
@@ -412,6 +672,8 @@ textarea{
       id="input"
       placeholder="Message Sahin AI..."
       rows="1"
+      autocomplete="off"
+      spellcheck="true"
     ></textarea>
 
 
@@ -419,6 +681,8 @@ textarea{
       class="send"
       id="send"
       title="Send"
+      aria-label="Send message"
+      type="button"
     >
       ➤
     </button>
@@ -428,11 +692,16 @@ textarea{
 </div>
 
 
-<!-- Settings -->
+<!-- =========================
+     SETTINGS
+========================= -->
 
 <div
   class="modal"
   id="modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="settingsTitle"
 >
 
   <div class="card">
@@ -440,11 +709,13 @@ textarea{
     <button
       class="close"
       id="close"
+      type="button"
+      aria-label="Close"
     >
       ×
     </button>
 
-    <h2>
+    <h2 id="settingsTitle">
       Settings
     </h2>
 
@@ -458,6 +729,7 @@ textarea{
       <button
         class="new"
         id="theme"
+        type="button"
       >
         Toggle
       </button>
@@ -474,6 +746,7 @@ textarea{
       <button
         class="new"
         id="clear"
+        type="button"
       >
         Clear
       </button>
@@ -500,6 +773,10 @@ textarea{
 
 <script>
 
+/* =========================
+   ELEMENTS
+========================= */
+
 const $ = id => document.getElementById(id);
 
 const chat = $("chat");
@@ -508,31 +785,61 @@ const input = $("input");
 const send = $("send");
 const historyBox = $("history");
 
+
+/* =========================
+   CHAT DATA
+========================= */
+
 let messages = [];
 
 try {
+
+  const saved =
+    localStorage.getItem("sahin_history");
+
+  const parsed =
+    JSON.parse(saved || "[]");
+
   messages =
-    JSON.parse(
-      localStorage.getItem("sahin_history") || "[]"
-    );
+    Array.isArray(parsed)
+      ? parsed
+      : [];
+
 } catch {
+
   messages = [];
+
 }
 
 
-/* Save chat */
+/* =========================
+   SAVE
+========================= */
 
 function save(){
 
-  localStorage.setItem(
-    "sahin_history",
-    JSON.stringify(messages)
-  );
+  try {
+
+    localStorage.setItem(
+      "sahin_history",
+      JSON.stringify(messages)
+    );
+
+  } catch(error){
+
+    console.warn(
+      "Could not save chat:",
+      error
+    );
+
+  }
 
 }
 
 
-/* Add message */
+/* =========================
+   ADD MESSAGE
+========================= */
 
 function addMessage(
   role,
@@ -562,7 +869,9 @@ function addMessage(
     "avatar";
 
   avatar.textContent =
-    role === "user" ? "U" : "S";
+    role === "user"
+      ? "U"
+      : "S";
 
 
   const bubble =
@@ -572,7 +881,7 @@ function addMessage(
     "bubble";
 
   bubble.textContent =
-    text;
+    String(text ?? "");
 
 
   row.appendChild(avatar);
@@ -585,7 +894,7 @@ function addMessage(
 
     messages.push({
       role:role,
-      text:text
+      text:String(text ?? "")
     });
 
     save();
@@ -594,14 +903,21 @@ function addMessage(
   }
 
 
-  chat.scrollTop =
-    chat.scrollHeight;
+  requestAnimationFrame(() => {
+
+    chat.scrollTop =
+      chat.scrollHeight;
+
+  });
+
 
   return row;
 }
 
 
-/* Render chat */
+/* =========================
+   RENDER
+========================= */
 
 function render(){
 
@@ -637,12 +953,19 @@ function render(){
 
   updateHistory();
 
-  chat.scrollTop =
-    chat.scrollHeight;
+  requestAnimationFrame(() => {
+
+    chat.scrollTop =
+      chat.scrollHeight;
+
+  });
+
 }
 
 
-/* History */
+/* =========================
+   HISTORY
+========================= */
 
 function updateHistory(){
 
@@ -653,12 +976,32 @@ function updateHistory(){
   }
 
 
+  const firstUserMessage =
+    messages.find(
+      message =>
+        message.role === "user"
+    );
+
+
+  if(!firstUserMessage){
+    return;
+  }
+
+
   const button =
     document.createElement("button");
 
+  const title =
+    firstUserMessage.text || "New chat";
+
   button.textContent =
-    messages[0].text.substring(0,35) +
-    (messages[0].text.length > 35 ? "..." : "");
+    title.substring(0,35) +
+    (
+      title.length > 35
+        ? "..."
+        : ""
+    );
+
 
   button.onclick = () => {
 
@@ -668,12 +1011,15 @@ function updateHistory(){
 
 
   historyBox.appendChild(button);
+
 }
 
 
-/* AI request */
+/* =========================
+   AI REQUEST
+========================= */
 
-async function reply(userText){
+async function reply(){
 
   const typing =
     addMessage(
@@ -682,14 +1028,17 @@ async function reply(userText){
       false
     );
 
-  typing
-    .querySelector(".bubble")
-    .classList.add("typing");
+
+  const bubble =
+    typing.querySelector(".bubble");
 
 
-  try{
+  bubble.classList.add("typing");
 
-    const api =
+
+  try {
+
+    const response =
       await fetch(
         "/api/chat",
         {
@@ -703,17 +1052,19 @@ async function reply(userText){
           body:JSON.stringify({
 
             messages:
-              messages.map(m => ({
+              messages.map(
+                message => ({
 
-                role:
-                  m.role === "assistant"
-                    ? "assistant"
-                    : "user",
+                  role:
+                    message.role === "assistant"
+                      ? "assistant"
+                      : "user",
 
-                content:
-                  m.text
+                  content:
+                    message.text
 
-              }))
+                })
+              )
 
           })
 
@@ -723,36 +1074,51 @@ async function reply(userText){
 
     let data = {};
 
-    try{
-      data = await api.json();
-    }catch{
-      data = {};
-    }
+    try {
 
+      data =
+        await response.json();
 
-    if(!api.ok){
+    } catch {
 
       throw new Error(
-        data.error ||
-        data.message ||
-        "Request failed"
+        "Server returned invalid JSON."
       );
 
     }
 
 
-    /* Support different backend formats */
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        data.message ||
+        `Server error: ${response.status}`
+      );
+
+    }
+
+
+    /*
+      Supports common backend
+      response formats.
+    */
 
     const aiText =
-      data.reply ||
-      data.text ||
-      data.message ||
-      data.content ||
-      data.response ||
-      data.output;
+      data.reply ??
+      data.text ??
+      data.message ??
+      data.content ??
+      data.response ??
+      data.output ??
+      data.choices?.[0]?.message?.content;
 
 
-    if(!aiText){
+    if(
+      aiText === undefined ||
+      aiText === null ||
+      String(aiText).trim() === ""
+    ){
 
       throw new Error(
         "The server returned no AI response."
@@ -763,26 +1129,34 @@ async function reply(userText){
 
     typing.remove();
 
+
     addMessage(
       "assistant",
       String(aiText)
     );
 
 
-  }catch(error){
+  } catch(error){
 
-    typing
-      .querySelector(".bubble")
-      .textContent =
-        "⚠️ " +
-        error.message;
+    bubble.classList.remove(
+      "typing"
+    );
+
+    bubble.textContent =
+      "⚠️ " +
+      (
+        error.message ||
+        "Something went wrong."
+      );
 
   }
 
 }
 
 
-/* Send */
+/* =========================
+   SEND MESSAGE
+========================= */
 
 async function sendMessage(){
 
@@ -790,7 +1164,14 @@ async function sendMessage(){
     input.value.trim();
 
 
-  if(!text) return;
+  if(
+    !text ||
+    send.disabled
+  ){
+
+    return;
+
+  }
 
 
   addMessage(
@@ -801,26 +1182,44 @@ async function sendMessage(){
 
   input.value = "";
 
+  input.style.height = "auto";
+
+
   send.disabled = true;
 
+  send.textContent = "⏳";
 
-  await reply(text);
 
+  try {
 
-  send.disabled = false;
+    await reply();
 
-  input.focus();
+  } finally {
+
+    send.disabled = false;
+
+    send.textContent = "➤";
+
+    input.focus();
+
+  }
 
 }
 
 
-/* Send button */
+/* =========================
+   SEND BUTTON
+========================= */
 
-send.onclick =
-  sendMessage;
+send.addEventListener(
+  "click",
+  sendMessage
+);
 
 
-/* Enter */
+/* =========================
+   ENTER TO SEND
+========================= */
 
 input.addEventListener(
   "keydown",
@@ -841,7 +1240,29 @@ input.addEventListener(
 );
 
 
-/* New chat */
+/* =========================
+   AUTO RESIZE TEXTAREA
+========================= */
+
+input.addEventListener(
+  "input",
+  () => {
+
+    input.style.height = "auto";
+
+    input.style.height =
+      Math.min(
+        input.scrollHeight,
+        150
+      ) + "px";
+
+  }
+);
+
+
+/* =========================
+   NEW CHAT
+========================= */
 
 $("newChat").onclick = () => {
 
@@ -851,12 +1272,18 @@ $("newChat").onclick = () => {
 
   render();
 
+  input.value = "";
+
+  input.style.height = "auto";
+
   input.focus();
 
 };
 
 
-/* Settings */
+/* =========================
+   SETTINGS
+========================= */
 
 function openSettings(){
 
@@ -873,7 +1300,9 @@ $("mobileSettings").onclick =
   openSettings;
 
 
-/* Close */
+/* =========================
+   CLOSE SETTINGS
+========================= */
 
 $("close").onclick = () => {
 
@@ -900,7 +1329,31 @@ $("modal").addEventListener(
 );
 
 
-/* Dark mode */
+/* =========================
+   ESC CLOSE MODAL
+========================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key === "Escape" &&
+      $("modal").style.display === "flex"
+    ){
+
+      $("modal").style.display =
+        "none";
+
+    }
+
+  }
+);
+
+
+/* =========================
+   DARK MODE
+========================= */
 
 $("theme").onclick = () => {
 
@@ -908,25 +1361,33 @@ $("theme").onclick = () => {
     "dark"
   );
 
+
   localStorage.setItem(
     "sahin_dark",
-    document.body.classList.contains("dark")
+    document.body.classList.contains(
+      "dark"
+    )
   );
 
 };
 
 
 if(
-  localStorage.getItem("sahin_dark")
-  === "true"
+  localStorage.getItem(
+    "sahin_dark"
+  ) === "true"
 ){
 
-  document.body.classList.add("dark");
+  document.body.classList.add(
+    "dark"
+  );
 
 }
 
 
-/* Clear */
+/* =========================
+   CLEAR CHAT
+========================= */
 
 $("clear").onclick = () => {
 
@@ -939,10 +1400,18 @@ $("clear").onclick = () => {
   $("modal").style.display =
     "none";
 
+  input.value = "";
+
+  input.style.height = "auto";
+
+  input.focus();
+
 };
 
 
-/* File */
+/* =========================
+   FILE SELECT
+========================= */
 
 $("file").onchange =
   event => {
@@ -950,7 +1419,9 @@ $("file").onchange =
     const file =
       event.target.files[0];
 
-    if(!file) return;
+    if(!file){
+      return;
+    }
 
 
     addMessage(
@@ -961,12 +1432,21 @@ $("file").onchange =
     );
 
 
+    /*
+      File is currently only
+      displayed in the chat.
+      Real file analysis needs
+      backend support.
+    */
+
     event.target.value = "";
 
   };
 
 
-/* Voice input */
+/* =========================
+   VOICE INPUT
+========================= */
 
 $("mic").onclick = () => {
 
@@ -991,7 +1471,7 @@ $("mic").onclick = () => {
 
 
   recognition.lang =
-    "en-US";
+    navigator.language || "en-US";
 
   recognition.interimResults =
     false;
@@ -1000,11 +1480,23 @@ $("mic").onclick = () => {
     1;
 
 
+  recognition.onstart = () => {
+
+    $("mic").textContent =
+      "🔴";
+
+  };
+
+
   recognition.onresult =
     event => {
 
       input.value =
         event.results[0][0].transcript;
+
+      input.dispatchEvent(
+        new Event("input")
+      );
 
       input.focus();
 
@@ -1012,21 +1504,43 @@ $("mic").onclick = () => {
 
 
   recognition.onerror =
-    () => {
+    event => {
 
-      alert(
-        "Could not recognize your voice."
+      console.warn(
+        "Speech recognition:",
+        event.error
       );
 
-    };
+  };
 
 
-  recognition.start();
+  recognition.onend = () => {
+
+    $("mic").textContent =
+      "🎙️";
+
+  };
+
+
+  try {
+
+    recognition.start();
+
+  } catch(error){
+
+    console.warn(
+      "Voice recognition:",
+      error
+    );
+
+  }
 
 };
 
 
-/* Start */
+/* =========================
+   START
+========================= */
 
 render();
 
