@@ -2,8 +2,8 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
 
   "name": "sahin-ai",
-
-  "compatibility_date": "2026-09-19",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-20",
 
   "assets": {
     "directory": ".",
